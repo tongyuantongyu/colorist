@@ -1,14 +1,14 @@
 //*@@@+++@@@@******************************************************************
 //
-// Copyright © Microsoft Corp.
+// Copyright ï¿½ Microsoft Corp.
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// ï¿½ Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// ï¿½ Redistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -1266,6 +1266,39 @@ ERR RGB101010_RGB48(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
 }
 
 
+ERR RGB101010_RGBA64(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+{
+    const I32 iHeight = pRect->Height;
+    const I32 iWidth = pRect->Width;
+    I32 y;
+
+    UNREFERENCED_PARAMETER( pFC );
+
+    // Stride is assumed to be same for src/dst
+    for (y = iHeight - 1; y >= 0; y--)
+    {
+        I32 x;
+        U16 *piDstPixel = (U16*)(pb + cbStride*y);
+        const U32 *piSrcPixel = (U32*)piDstPixel;
+
+        for (x = iWidth - 1; x >= 0; x--)
+        {
+            const U32 v = piSrcPixel[x];
+            const unsigned int r = ((v >> 20) & 0x3FF);
+            const unsigned int g = ((v >> 10) & 0x3FF);
+            const unsigned int b = (v & 0x3FF);
+
+            piDstPixel[4*x] = (U16)(r << 6);    // R
+            piDstPixel[4*x+1] = (U16)(g << 6);  // G
+            piDstPixel[4*x+2] = (U16)(b << 6);  // B
+            piDstPixel[4*x+3] = 0xffff;        // A
+        }
+    }
+
+    return WMP_errSuccess;
+}
+
+
 ERR RGB24_RGB555(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
@@ -2136,6 +2169,7 @@ static PKPixelConverterInfo s_pcInfo[] = {
     {&GUID_PKPixelFormat24bppRGB, &GUID_PKPixelFormat16bppRGB565, RGB24_RGB565}, // Rev
     {&GUID_PKPixelFormat32bppRGB101010, &GUID_PKPixelFormat48bppRGB, RGB101010_RGB48}, // Fwd
     {&GUID_PKPixelFormat48bppRGB, &GUID_PKPixelFormat32bppRGB101010, RGB48_RGB101010}, // Rev
+    {&GUID_PKPixelFormat32bppRGB101010, &GUID_PKPixelFormat64bppRGBA, RGB101010_RGBA64}, // Fwd
     {&GUID_PKPixelFormat32bppRGBA, &GUID_PKPixelFormat32bppBGRA, RGBA32_BGRA32}, // Fwd
     {&GUID_PKPixelFormat32bppBGRA, &GUID_PKPixelFormat32bppRGBA, BGRA32_RGBA32}, // Rev
     {&GUID_PKPixelFormat32bppPRGBA, &GUID_PKPixelFormat32bppPBGRA, RGBA32_BGRA32}, // Fwd

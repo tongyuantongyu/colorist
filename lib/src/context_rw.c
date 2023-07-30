@@ -74,6 +74,16 @@ struct clImage * clContextRead(clContext * C, const char * filename, const char 
             overrideProfile = NULL;
         }
     }
+
+    if (C->enforceLuminance) {
+        if (!image->profile) {
+            clContextLogError(C, "No profile for input, cannot enforce luminance");
+        } else {
+            clProfileSetLuminance(C, image->profile, C->defaultLuminance);
+            clContextLog(C, "profile", 1, "Overriding profile luminance as: %d nits", C->defaultLuminance);
+        }
+    }
+
     clRawFree(C, &input);
     return image;
 }

@@ -135,6 +135,24 @@ struct clImage * clFormatReadJXR(struct clContext * C, const char * formatName, 
             profile = clProfileCreate(C, &primaries, &curve, 80, NULL);
 
             scRGB = clTrue;
+        } else if (!memcmp(pixelFormat.pGUIDPixFmt, &GUID_PKPixelFormat32bppRGB101010, sizeof(GUID_PKPixelFormat32bppRGB101010))) {
+            clContextLog(C, "jxr", 1, "Decoded RGB10X2 JXR with no profile, assuming BT2020 PQ @ 10000 nits");
+
+            clProfilePrimaries primaries;
+            primaries.red[0] = 0.708f;
+            primaries.red[1] = 0.292f;
+            primaries.green[0] = 0.170f;
+            primaries.green[1] = 0.797f;
+            primaries.blue[0] = 0.131f;
+            primaries.blue[1] = 0.046f;
+            primaries.white[0] = 0.3127f;
+            primaries.white[1] = 0.3290f;
+
+            clProfileCurve curve;
+            curve.type = CL_PCT_PQ;
+            curve.gamma = 1.0f;
+
+            profile = clProfileCreate(C, &primaries, &curve, 10000, NULL);
         }
     }
 
