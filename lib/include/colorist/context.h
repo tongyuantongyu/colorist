@@ -281,6 +281,7 @@ typedef struct clContext
     const char * inputFilename;    // index 0
     const char * outputFilename;   // index 1
     int defaultLuminance;
+    clBool enforceLuminance;
 } clContext;
 
 struct clImage;

@@ -461,6 +461,7 @@ static void clContextSetDefaultArgs(clContext * C)
     C->inputFilename = NULL;
     C->outputFilename = NULL;
     C->defaultLuminance = COLORIST_DEFAULT_LUMINANCE;
+    C->enforceLuminance = clFalse;
 }
 
 clContext * clContextCreate(clContextSystem * system)
@@ -899,6 +900,14 @@ clBool clContextParseArgs(clContext * C, int argc, const char * argv[])
                 }
             } else if (!strcmp(arg, "--deflum")) {
                 NEXTARG();
+                C->defaultLuminance = atoi(arg);
+                if (C->defaultLuminance <= 0) {
+                    clContextLogError(C, "Invalid default luminance: %s", arg);
+                    return clFalse;
+                }
+            } else if (!strcmp(arg, "--forcelum")) {
+                NEXTARG();
+                C->enforceLuminance = clTrue;
                 C->defaultLuminance = atoi(arg);
                 if (C->defaultLuminance <= 0) {
                     clContextLogError(C, "Invalid default luminance: %s", arg);
