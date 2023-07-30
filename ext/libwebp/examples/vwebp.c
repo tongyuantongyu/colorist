@@ -292,6 +292,19 @@ static void PrintString(const char* const text) {
   }
 }
 
+static void PrintStringW(const char* const text) {
+#if defined(_WIN32) && defined(_UNICODE)
+  void* const font = GLUT_BITMAP_9_BY_15;
+  const W_CHAR* const wtext = (const W_CHAR*)text;
+  int i;
+  for (i = 0; wtext[i]; ++i) {
+    glutBitmapCharacter(font, wtext[i]);
+  }
+#else
+  PrintString(text);
+#endif
+}
+
 static float GetColorf(uint32_t color, int shift) {
   return ((color >> shift) & 0xff) / 255.f;
 }
@@ -396,7 +409,7 @@ static void HandleDisplay(void) {
 
     glColor4f(0.90f, 0.0f, 0.90f, 1.0f);
     glRasterPos2f(-0.95f, 0.90f);
-    PrintString(kParams.file_name);
+    PrintStringW(kParams.file_name);
 
     snprintf(tmp, sizeof(tmp), "Dimension:%d x %d", pic->width, pic->height);
     glColor4f(0.90f, 0.0f, 0.90f, 1.0f);
@@ -418,8 +431,9 @@ static void HandleDisplay(void) {
 }
 
 static void StartDisplay(void) {
-  const int width = kParams.canvas_width;
-  const int height = kParams.canvas_height;
+  int width = kParams.canvas_width;
+  int height = kParams.canvas_height;
+  int screen_width, screen_height;
   // TODO(webp:365) GLUT_DOUBLE results in flickering / old frames to be
   // partially displayed with animated webp + alpha.
 #if defined(__APPLE__) || defined(_WIN32)
@@ -427,6 +441,18 @@ static void StartDisplay(void) {
 #else
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 #endif
+  screen_width = glutGet(GLUT_SCREEN_WIDTH);
+  screen_height = glutGet(GLUT_SCREEN_HEIGHT);
+  if (width > screen_width || height > screen_height) {
+    if (width > screen_width) {
+      height = (height * screen_width + width - 1) / width;
+      width = screen_width;
+    }
+    if (height > screen_height) {
+      width = (width * screen_height + height - 1) / height;
+      height = screen_height;
+    }
+  }
   glutInitWindowSize(width, height);
   glutCreateWindow("WebP viewer");
   glutDisplayFunc(HandleDisplay);
@@ -466,7 +492,7 @@ static void Help(void) {
       "  'q' / 'Q' / ESC .... quit\n");
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   int c;
   WebPDecoderConfig* const config = &kParams.config;
   WebPIterator* const curr = &kParams.curr_frame;
@@ -617,7 +643,7 @@ int main(int argc, char *argv[]) {
 
 #else   // !WEBP_HAVE_GL
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
   fprintf(stderr, "OpenGL support not enabled in %s.\n", argv[0]);
   (void)argc;
   return 0;

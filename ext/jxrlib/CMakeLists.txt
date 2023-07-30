@@ -34,7 +34,7 @@ set(JXRLIB_SRCS
     image/sys/strTransform.h
     image/sys/windowsmediaphoto.h
     image/sys/xplatform_image.h
-#    image/x86/x86.h
+    image/x86/x86.h
 #    jxrencoderdecoder/JXRDec420.c
 #    jxrencoderdecoder/JxrDecApp.c
 #    jxrencoderdecoder/JxrEnc420.c

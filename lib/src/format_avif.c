@@ -178,7 +178,7 @@ struct clImage * clFormatReadAVIF(struct clContext * C, const char * formatName,
         }
     }
     if (decoder->image->transformFlags & AVIF_TRANSFORM_IMIR) {
-        C->readExtraInfo.mirrorNeeded = decoder->image->imir.axis + 1;
+        C->readExtraInfo.mirrorNeeded = 2 - decoder->image->imir.mode;
     }
 readCleanup:
     avifDecoderDestroy(decoder);
@@ -232,7 +232,7 @@ clBool clFormatWriteAVIF(struct clContext * C, struct clImage * image, const cha
             avif->colorPrimaries = (uint16_t)writeParams->nclx[0];
             avif->transferCharacteristics = (uint16_t)writeParams->nclx[1];
             avif->matrixCoefficients = (uint16_t)writeParams->nclx[2];
-            avif->yuvRange = AVIF_RANGE_FULL;
+            avif->yuvRange = image->depth > 8 ? AVIF_RANGE_LIMITED : AVIF_RANGE_FULL;
             clContextLog(C,
                          "avif",
                          1,
@@ -254,10 +254,13 @@ clBool clFormatWriteAVIF(struct clContext * C, struct clImage * image, const cha
             clContextLog(C, "avif", 1, "Writing colr box (icc): %u bytes", (uint32_t)rawProfile.size);
             avifImageSetProfileICC(avif, rawProfile.ptr, rawProfile.size);
         }
+        avif->clli.maxCLL = (uint16_t)roundf(clImagePeakLuminance(C, image));
+        clContextLog(C, "avif", 1, "Writing clli box : maxCLL: %u", (uint32_t)avif->clli.maxCLL);
     }
 
     avifRGBImage rgb;
     avifRGBImageSetDefaults(&rgb, avif);
+    rgb.chromaDownsampling = AVIF_CHROMA_DOWNSAMPLING_BEST_QUALITY;
     if (avifImageUsesU16(avif)) {
         clImagePrepareReadPixels(C, image, CL_PIXELFORMAT_U16);
 
@@ -289,22 +292,14 @@ clBool clFormatWriteAVIF(struct clContext * C, struct clImage * image, const cha
     if ((writeParams->quantizerMin == -1) && (writeParams->quantizerMax == -1)) {
         int quality = writeParams->quality ? writeParams->quality : 100; // consider 0 to be lossless (100)
 
-        // minQuantizer ramps up from quality 63 -> 1 linearly, and arrives at 63 right when Q=1.
-        // maxQuantizer ramps up from quality 100 -> 37 linearly, and then clamps at 63 all the way to Q=1.
-        // Q=1 should end up with [63,63], which is as bad as possible.
-        // There is still a bit of a flat spot in the 30s/40s, but this feels like a reasonable quality
-        // dial in general. End users can use --quantizer if they want to be exact.
-        encoder->minQuantizer = 64 - quality;
-        encoder->minQuantizer = CL_CLAMP(encoder->minQuantizer, 0, 63);
-        encoder->maxQuantizer = 100 - quality;
-        encoder->maxQuantizer = CL_CLAMP(encoder->maxQuantizer, 0, 63);
+        encoder->quality = quality;
+        encoder->minQuantizer = 0;
+        encoder->maxQuantizer = 63;
         clContextLog(C,
                      "avif",
                      1,
-                     "Encoding quantizer (0=lossless, 63=worst) min/max: %d/%d    (derived from Q=%d%s)",
-                     encoder->minQuantizer,
-                     encoder->maxQuantizer,
-                     writeParams->quality,
+                     "Encoding quality: %d",
+                     quality,
                      (quality == 100) ? " [Lossless]" : "");
     } else {
         encoder->minQuantizer = writeParams->quantizerMin;
@@ -369,7 +364,7 @@ static clProfile * nclxToclProfile(struct clContext * C, avifImage * avif)
     curve.type = CL_PCT_GAMMA;
     curve.gamma = 2.2f;
     curve.implicitScale = 1.0f;
-    maxLuminance = CL_LUMINANCE_UNSPECIFIED;
+    maxLuminance = avif->clli.maxCLL == 0 ? CL_LUMINANCE_UNSPECIFIED : avif->clli.maxCLL;
 
     float prim[8];
     avifColorPrimariesGetValues(avif->colorPrimaries, prim);
@@ -390,7 +385,9 @@ static clProfile * nclxToclProfile(struct clContext * C, avifImage * avif)
         case AVIF_TRANSFER_CHARACTERISTICS_SMPTE2084:
             curve.type = CL_PCT_PQ;
             curve.gamma = 1.0f;
-            maxLuminance = 10000;
+            if (maxLuminance == CL_LUMINANCE_UNSPECIFIED) {
+                maxLuminance = 10000;
+            }
             break;
         case AVIF_TRANSFER_CHARACTERISTICS_BT470M:
             curve.type = CL_PCT_GAMMA;

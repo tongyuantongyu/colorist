@@ -115,8 +115,8 @@ struct clImage * clFormatReadJXR(struct clContext * C, const char * formatName, 
             goto readCleanup;
         }
     } else {
-        if (!memcmp(pixelFormat.pGUIDPixFmt, &GUID_PKPixelFormat64bppRGBAHalf, sizeof(GUID_PKPixelFormat64bppRGBAHalf))) {
-            clContextLog(C, "jxr", 1, "Decoded 16bpc half-float JXR with no profile, assuming MS Game Bar screencap (scRGB linear @ 80 nits)");
+        if (pixelFormat.bdBitDepth == BD_32F || pixelFormat.bdBitDepth == BD_16F) {
+            clContextLog(C, "jxr", 1, "Decoded %s JXR with no profile, assuming MS Game Bar screencap (scRGB linear @ 80 nits)", pixelFormat.bdBitDepth == BD_32F ? "float" : "half");
 
             clProfilePrimaries primaries;
             primaries.red[0] = 0.64f;

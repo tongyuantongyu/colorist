@@ -66,8 +66,6 @@ include_directories(${COLORIST_EXT_INCLUDES})
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   MESSAGE(STATUS "Enabling warnings (for colorist lib/bin) for Clang")
   add_definitions(
-    -Weverything
-    -Werror
     -Wno-bad-function-cast
     -Wno-c11-extensions
     -Wno-cast-align
