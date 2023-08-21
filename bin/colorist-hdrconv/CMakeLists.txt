@@ -5,8 +5,15 @@
 #                  http://www.boost.org/LICENSE_1_0.txt)
 # ---------------------------------------------------------------------------
 
-add_subdirectory(colorist)
-add_subdirectory(colorist-benchmark)
-add_subdirectory(colorist-test)
-add_subdirectory(colorist-yuv)
-add_subdirectory(colorist-hdrconv)
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD 20)
+
+set(COLORIST_HDRCONV_SRCS
+        main.cpp
+)
+
+add_executable(colorist-hdrconv
+        ${COLORIST_HDRCONV_SRCS}
+)
+target_link_libraries(colorist-hdrconv PRIVATE colorist)
+set_target_properties(colorist-hdrconv PROPERTIES OUTPUT_NAME colorist-hdrconv)

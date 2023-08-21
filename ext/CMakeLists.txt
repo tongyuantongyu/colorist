@@ -161,7 +161,7 @@ else()
             jpeg/transupp.c
             jpeg/wrbmp.c
             jpeg/wrgif.c
-            jpeg/wrjpgcom.c
+#            jpeg/wrjpgcom.c
             jpeg/wrppm.c
             jpeg/wrrle.c
             jpeg/wrtarga.c

@@ -75,18 +75,18 @@ void clContextDefaultLog(clContext * C, const char * section, int indent, const 
         if (spacesNeeded < 0)
             spacesNeeded = 0;
         spaces[spacesNeeded] = 0;
-        fprintf(stdout, "[%s%s] ", spaces, section);
+        fprintf(stderr, "[%s%s] ", spaces, section);
     }
     if (indent < 0)
         indent = 17 + indent;
     if (indent > 0) {
         int i;
         for (i = 0; i < indent; ++i) {
-            fprintf(stdout, "    ");
+            fprintf(stderr, "    ");
         }
     }
-    vfprintf(stdout, format, args);
-    fprintf(stdout, "\n");
+    vfprintf(stderr, format, args);
+    fprintf(stderr, "\n");
 }
 
 void clContextDefaultLogError(clContext * C, const char * format, va_list args)
