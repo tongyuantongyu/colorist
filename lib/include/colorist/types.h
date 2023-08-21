@@ -14,7 +14,7 @@
 // for uint*_t
 #include <stdint.h>
 
-int clFileSize(const char * filename);
+int clFileSize(const wchar_t * filename);
 
 #define COLORIST_WARNING(MSG)                       \
     {                                               \

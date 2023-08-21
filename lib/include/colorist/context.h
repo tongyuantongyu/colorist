@@ -86,7 +86,7 @@ typedef struct clFormat
 clBool clFormatExists(struct clContext * C, const char * formatName);
 int clFormatMaxDepth(struct clContext * C, const char * formatName);
 int clFormatBestDepth(struct clContext * C, const char * formatName, int reqDepth);
-const char * clFormatDetect(struct clContext * C, const char * filename);
+const wchar_t * clFormatDetect(struct clContext * C, const wchar_t * filename);
 
 // TODO: consider merging with clTonemapParams (requires API refactor)
 typedef enum clTonemap
@@ -278,8 +278,8 @@ typedef struct clContext
     int jobs;                      // -j
     clBool verbose;                // -v
     clBool ccmmAllowed;            // --ccmm
-    const char * inputFilename;    // index 0
-    const char * outputFilename;   // index 1
+    const wchar_t * inputFilename;    // index 0
+    const wchar_t * outputFilename;   // index 1
     int defaultLuminance;
     clBool enforceLuminance;
 } clContext;
@@ -304,10 +304,10 @@ void clContextPrintSyntax(clContext * C);
 void clContextPrintVersions(clContext * C);
 clBool clContextParseArgs(clContext * C, int argc, const char * argv[]);
 
-struct clImage * clContextRead(clContext * C, const char * filename, const char * iccOverride, const char ** outFormatName);
-clBool clContextWrite(clContext * C, struct clImage * image, const char * filename, const char * formatName, clWriteParams * writeParams);
+struct clImage * clContextRead(clContext * C, const wchar_t * filename, const char * iccOverride, const char ** outFormatName);
+clBool clContextWrite(clContext * C, struct clImage * image, const wchar_t * filename, const char * formatName, clWriteParams * writeParams);
 char * clContextWriteURI(struct clContext * C, struct clImage * image, const char * formatName, clWriteParams * writeParams);
-void clContextLogWrite(clContext * C, const char * filename, const char * formatName, clWriteParams * writeParams);
+void clContextLogWrite(clContext * C, const wchar_t * filename, const char * formatName, clWriteParams * writeParams);
 
 clBool clContextGetStockPrimaries(struct clContext * C, const char * name, struct clProfilePrimaries * outPrimaries);
 clBool clContextGetRawStockPrimaries(struct clContext * C, const char * name, float outPrimaries[8]);

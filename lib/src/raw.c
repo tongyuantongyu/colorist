@@ -153,14 +153,14 @@ void clRawFree(struct clContext * C, clRaw * raw)
     raw->size = 0;
 }
 
-clBool clRawReadFile(struct clContext * C, clRaw * raw, const char * filename)
+clBool clRawReadFile(struct clContext * C, clRaw * raw, const wchar_t * filename)
 {
     long bytes;
     FILE * f;
 
-    f = fopen(filename, "rb");
+    f = _wfopen(filename, L"rb");
     if (!f) {
-        clContextLogError(C, "Failed to open file for read: %s", filename);
+        clContextLogError(C, "Failed to open file for read.");
         return clFalse;
     }
     fseek(f, 0, SEEK_END);
@@ -169,7 +169,7 @@ clBool clRawReadFile(struct clContext * C, clRaw * raw, const char * filename)
 
     clRawRealloc(C, raw, bytes);
     if (fread(raw->ptr, raw->size, 1, f) != 1) {
-        clContextLogError(C, "Failed to read file [%d bytes]: %s", (int)raw->size, filename);
+        clContextLogError(C, "Failed to read file [%d bytes].", (int)raw->size);
         fclose(f);
         clRawFree(C, raw);
         return clFalse;
@@ -178,20 +178,20 @@ clBool clRawReadFile(struct clContext * C, clRaw * raw, const char * filename)
     return clTrue;
 }
 
-clBool clRawReadFileHeader(struct clContext * C, clRaw * raw, const char * filename, size_t bytes)
+clBool clRawReadFileHeader(struct clContext * C, clRaw * raw, const wchar_t * filename, size_t bytes)
 {
     FILE * f;
 
-    f = fopen(filename, "rb");
+    f = _wfopen(filename, L"rb");
     if (!f) {
-        clContextLogError(C, "Failed to open file for read: %s", filename);
+        clContextLogError(C, "Failed to open file for read.");
         return clFalse;
     }
 
     clRawRealloc(C, raw, bytes);
     size_t bytesRead = fread(raw->ptr, 1, raw->size, f);
     if (bytesRead == 0) {
-        clContextLogError(C, "Failed to read file [%d bytes]: %s", (int)raw->size, filename);
+        clContextLogError(C, "Failed to read file [%d bytes].", (int)raw->size);
         fclose(f);
         clRawFree(C, raw);
         return clFalse;
@@ -202,19 +202,19 @@ clBool clRawReadFileHeader(struct clContext * C, clRaw * raw, const char * filen
     return clTrue;
 }
 
-clBool clRawWriteFile(struct clContext * C, clRaw * raw, const char * filename)
+clBool clRawWriteFile(struct clContext * C, clRaw * raw, const wchar_t * filename)
 {
     FILE * f;
 
-    f = fopen(filename, "wb");
+    f = _wfopen(filename, L"wb");
     if (!f) {
-        clContextLogError(C, "Failed to open file for write: %s", filename);
+        clContextLogError(C, "Failed to open file for write.");
         return clFalse;
     }
     if (raw->size > 0) {
         if (fwrite(raw->ptr, raw->size, 1, f) != 1) {
             fclose(f);
-            clContextLogError(C, "Failed to write %d bytes to: %s", raw->size, filename);
+            clContextLogError(C, "Failed to write %d bytes to.", raw->size);
             return clFalse;
         }
     }
@@ -222,13 +222,13 @@ clBool clRawWriteFile(struct clContext * C, clRaw * raw, const char * filename)
     return clTrue;
 }
 
-int clFileSize(const char * filename)
+int clFileSize(const wchar_t * filename)
 {
     // TODO: reimplement as fstat()
     long bytes;
 
     FILE * f;
-    f = fopen(filename, "rb");
+    f = _wfopen(filename, L"rb");
     if (!f) {
         return -1;
     }

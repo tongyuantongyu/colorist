@@ -99,7 +99,7 @@ const char * clActionToString(struct clContext * C, clAction action)
 // ------------------------------------------------------------------------------------------------
 // clFormat
 
-static char const * clFormatDetectHeader(struct clContext * C, const char * filename)
+static char const * clFormatDetectHeader(struct clContext * C, const wchar_t * filename)
 {
     clRaw raw = CL_RAW_EMPTY;
     if (clRawReadFileHeader(C, &raw, filename, 1024)) {
@@ -114,42 +114,42 @@ static char const * clFormatDetectHeader(struct clContext * C, const char * file
     return NULL;
 }
 
-const char * clFormatDetect(struct clContext * C, const char * filename)
-{
-    // If either slash is AFTER the last period in the filename, there is no extension
-    const char * lastBackSlash = strrchr(filename, '\\');
-    const char * lastSlash = strrchr(filename, '/');
-    const char * ext = strrchr(filename, '.');
-    if ((ext == NULL) || (lastBackSlash && (lastBackSlash > ext)) || (lastSlash && (lastSlash > ext))) {
-        ext = clFormatDetectHeader(C, filename);
-        if (ext)
-            return ext;
-
-        clContextLogError(C, "Unable to guess format");
-        return NULL;
-    }
-    ++ext; // skip past the period
-
-    // Special case: icc profile (this might be bad)
-    if (!strcmp(ext, "icc")) {
-        return "icc";
-    }
-
-    for (clFormatRecord * record = C->formats; record != NULL; record = record->next) {
-        int extensionIndex;
-        for (extensionIndex = 0; extensionIndex < CL_FORMAT_MAX_EXTENSIONS; ++extensionIndex) {
-            if (record->format.extensions[extensionIndex] && !strcmp(record->format.extensions[extensionIndex], ext)) {
-                return record->format.name;
-            }
-        }
-    }
-
-    ext = clFormatDetectHeader(C, filename);
-    if (ext)
-        return ext;
-
-    return NULL;
-}
+//const wchar_t * clFormatDetect(struct clContext * C, const wchar_t * filename)
+//{
+//    // If either slash is AFTER the last period in the filename, there is no extension
+//    const wchar_t * lastBackSlash = wcsrchr(filename, L'\\');
+//    const wchar_t * lastSlash = wcsrchr(filename, L'/');
+//    const wchar_t * ext = wcsrchr(filename, L'.');
+//    if ((ext == NULL) || (lastBackSlash && (lastBackSlash > ext)) || (lastSlash && (lastSlash > ext))) {
+//        ext = clFormatDetectHeader(C, filename);
+//        if (ext)
+//            return ext;
+//
+//        clContextLogError(C, "Unable to guess format");
+//        return NULL;
+//    }
+//    ++ext; // skip past the period
+//
+//    // Special case: icc profile (this might be bad)
+//    if (!strcmp(ext, "icc")) {
+//        return "icc";
+//    }
+//
+//    for (clFormatRecord * record = C->formats; record != NULL; record = record->next) {
+//        int extensionIndex;
+//        for (extensionIndex = 0; extensionIndex < CL_FORMAT_MAX_EXTENSIONS; ++extensionIndex) {
+//            if (record->format.extensions[extensionIndex] && !strcmp(record->format.extensions[extensionIndex], ext)) {
+//                return record->format.name;
+//            }
+//        }
+//    }
+//
+//    ext = clFormatDetectHeader(C, filename);
+//    if (ext)
+//        return ext;
+//
+//    return NULL;
+//}
 
 int clFormatMaxDepth(struct clContext * C, const char * formatName)
 {

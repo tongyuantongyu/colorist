@@ -116,11 +116,11 @@ void clContextLogError(clContext * C, const char * format, ...)
     va_end(args);
 }
 
-void clContextLogWrite(clContext * C, const char * filename, const char * formatName, clWriteParams * writeParams)
+void clContextLogWrite(clContext * C, const wchar_t * filename, const char * formatName, clWriteParams * writeParams)
 {
-    if (!formatName) {
-        formatName = clFormatDetect(C, filename);
-    }
+//    if (!formatName) {
+//        formatName = clFormatDetect(C, filename);
+//    }
     clFormat * format = clContextFindFormat(C, formatName);
 
     char yuvText[128];
@@ -131,25 +131,24 @@ void clContextLogWrite(clContext * C, const char * filename, const char * format
 
     if (format && format->usesRate && format->usesQuality) {
         if ((writeParams->rate == 0) && (writeParams->quality == 100)) {
-            clContextLog(C, "encode", 0, "Writing %s [Lossless]%s: %s", format->description, yuvText, filename);
+            clContextLog(C, "encode", 0, "Writing %s [Lossless]%s.", format->description, yuvText);
         } else {
             clContextLog(C,
                          "encode",
                          0,
-                         "Writing %s [%s:%d]%s: %s",
+                         "Writing %s [%s:%d]%s.",
                          format->description,
                          (writeParams->rate) ? "R" : "Q",
                          (writeParams->rate) ? writeParams->rate : writeParams->quality,
-                         yuvText,
-                         filename);
+                         yuvText);
         }
     } else if (format && format->usesQuality) {
         if (writeParams->quality == 100) {
-            clContextLog(C, "encode", 0, "Writing %s [Lossless]%s: %s", format->description, yuvText, filename);
+            clContextLog(C, "encode", 0, "Writing %s [Lossless]%s.", format->description, yuvText);
         } else {
-            clContextLog(C, "encode", 0, "Writing %s [Q:%d]%s: %s", format->description, writeParams->quality, yuvText, filename);
+            clContextLog(C, "encode", 0, "Writing %s [Q:%d]%s.", format->description, writeParams->quality, yuvText);
         }
     } else {
-        clContextLog(C, "encode", 0, "Writing %s%s: %s", format->description, yuvText, filename);
+        clContextLog(C, "encode", 0, "Writing %s%s.", format->description, yuvText);
     }
 }

@@ -20,22 +20,9 @@ int handle_image(clContext * C, const std::filesystem::path & input)
     std::filesystem::path output = input;
     output.replace_extension("avif");
 
-    char narrow_in[4096] {}, narrow_out[4096] {};
-    size_t dont_care;
-    auto err = wcstombs_s(&dont_care, narrow_in, input.c_str(), 4095);
-    if (err) {
-        fprintf(stderr, "Non-ANSI file name unsupported.\n");
-        return 1;
-    }
-    if (wcstombs_s(&dont_care, narrow_out, output.c_str(), 4095)) {
-        fprintf(stderr, "Non-ANSI file name unsupported.\n");
-        return 1;
-    }
+    C->inputFilename = input.c_str();
+    C->outputFilename = output.c_str();
 
-    C->inputFilename = narrow_in;
-    C->outputFilename = narrow_out;
-
-    fprintf(stderr, "Found new file %s\n", C->inputFilename);
     return clContextConvert(C);
 }
 

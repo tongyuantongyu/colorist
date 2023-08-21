@@ -52,17 +52,17 @@ int clContextConvert(clContext * C)
     clConversionParams params;
     memcpy(&params, &C->params, sizeof(params));
 
-    if (!params.formatName)
-        params.formatName = clFormatDetect(C, C->outputFilename);
+//    if (!params.formatName)
+//        params.formatName = clFormatDetect(C, C->outputFilename);
     if (!params.formatName) {
-        clContextLogError(C, "Unknown output file format: %s", C->outputFilename);
+        clContextLogError(C, "Unknown output file format.");
         FAIL();
     }
 
-    clContextLog(C, "action", 0, "Convert [%d max threads]: %s -> %s", C->jobs, C->inputFilename, C->outputFilename);
+    clContextLog(C, "action", 0, "Convert [%d max threads]", C->jobs);
     timerStart(&overall);
 
-    clContextLog(C, "decode", 0, "Reading: %s (%d bytes)", C->inputFilename, clFileSize(C->inputFilename));
+    clContextLog(C, "decode", 0, "Reading: <input> (%d bytes)", clFileSize(C->inputFilename));
     timerStart(&t);
     srcImage = clContextRead(C, C->inputFilename, C->iccOverrideIn, NULL);
     if (srcImage == NULL) {
@@ -83,35 +83,35 @@ int clContextConvert(clContext * C)
     }
 
     // Load HALD, if any
-    if (params.hald) {
-        haldImage = clContextRead(C, params.hald, NULL, NULL);
-        if (!haldImage) {
-            clContextLogError(C, "Can't read Hald CLUT: %s", params.hald);
-            FAIL();
-        }
-        if (haldImage->width != haldImage->height) {
-            clContextLogError(C, "Hald CLUT isn't square [%dx%d]: %s", haldImage->width, haldImage->height, params.hald);
-            FAIL();
-        }
-
-        // Calc haldDims
-        {
-            int i;
-            for (i = 0; i < 32; ++i) {
-                if ((i * i * i) == haldImage->width) {
-                    haldDims = i * i;
-                    break;
-                }
-            }
-
-            if (haldDims == 0) {
-                clContextLogError(C, "Hald CLUT dimensions aren't cubic [%dx%d]: %s", haldImage->width, haldImage->height, params.hald);
-                FAIL();
-            }
-
-            clContextLog(C, "hald", 0, "Loaded %dx%dx%d Hald CLUT: %s", haldDims, haldDims, haldDims, params.hald);
-        }
-    }
+//    if (params.hald) {
+//        haldImage = clContextRead(C, params.hald, NULL, NULL);
+//        if (!haldImage) {
+//            clContextLogError(C, "Can't read Hald CLUT: %s", params.hald);
+//            FAIL();
+//        }
+//        if (haldImage->width != haldImage->height) {
+//            clContextLogError(C, "Hald CLUT isn't square [%dx%d]: %s", haldImage->width, haldImage->height, params.hald);
+//            FAIL();
+//        }
+//
+//        // Calc haldDims
+//        {
+//            int i;
+//            for (i = 0; i < 32; ++i) {
+//                if ((i * i * i) == haldImage->width) {
+//                    haldDims = i * i;
+//                    break;
+//                }
+//            }
+//
+//            if (haldDims == 0) {
+//                clContextLogError(C, "Hald CLUT dimensions aren't cubic [%dx%d]: %s", haldImage->width, haldImage->height, params.hald);
+//                FAIL();
+//            }
+//
+//            clContextLog(C, "hald", 0, "Loaded %dx%dx%d Hald CLUT: %s", haldDims, haldDims, haldDims, params.hald);
+//        }
+//    }
 
     int crop[4];
     memcpy(crop, C->params.rect, 4 * sizeof(int));
@@ -336,43 +336,43 @@ int clContextConvert(clContext * C)
         FAIL();
     }
 
-    if (C->params.compositeFilename) {
-        clContextLog(C,
-                     "composite",
-                     0,
-                     "Composition enabled. Reading: %s (%d bytes)",
-                     C->params.compositeFilename,
-                     clFileSize(C->params.compositeFilename));
-        timerStart(&t);
-        clImage * compositeImage = clContextRead(C, params.compositeFilename, NULL, NULL);
-        if (compositeImage == NULL) {
-            clContextLogError(C, "Can't load composite image, bailing out");
-            FAIL();
-        }
-        clContextLog(C, "timing", -1, TIMING_FORMAT, timerElapsedSeconds(&t));
-
-        clContextLog(C,
-                     "composite",
-                     0,
-                     "Blending composite on top (%.2g gamma, %s, offset %d,%d)...",
-                     params.compositeParams.gamma,
-                     params.compositeParams.premultiplied ? "premultiplied" : "not premultiplied",
-                     params.compositeParams.offsetX,
-                     params.compositeParams.offsetY);
-        timerStart(&t);
-        params.compositeParams.srcTonemap = params.tonemap;
-        memcpy(&params.compositeParams.srcParams, &params.tonemapParams, sizeof(clTonemapParams));
-        clImage * blendedImage = clImageBlend(C, dstImage, compositeImage, &params.compositeParams);
-        if (!blendedImage) {
-            clContextLogError(C, "Image blend failed, bailing out");
-            clImageDestroy(C, blendedImage);
-            FAIL();
-        }
-        clContextLog(C, "timing", -1, TIMING_FORMAT, timerElapsedSeconds(&t));
-
-        clImageDestroy(C, dstImage);
-        dstImage = blendedImage;
-    }
+//    if (C->params.compositeFilename) {
+//        clContextLog(C,
+//                     "composite",
+//                     0,
+//                     "Composition enabled. Reading: %s (%d bytes)",
+//                     C->params.compositeFilename,
+//                     clFileSize(C->params.compositeFilename));
+//        timerStart(&t);
+//        clImage * compositeImage = clContextRead(C, params.compositeFilename, NULL, NULL);
+//        if (compositeImage == NULL) {
+//            clContextLogError(C, "Can't load composite image, bailing out");
+//            FAIL();
+//        }
+//        clContextLog(C, "timing", -1, TIMING_FORMAT, timerElapsedSeconds(&t));
+//
+//        clContextLog(C,
+//                     "composite",
+//                     0,
+//                     "Blending composite on top (%.2g gamma, %s, offset %d,%d)...",
+//                     params.compositeParams.gamma,
+//                     params.compositeParams.premultiplied ? "premultiplied" : "not premultiplied",
+//                     params.compositeParams.offsetX,
+//                     params.compositeParams.offsetY);
+//        timerStart(&t);
+//        params.compositeParams.srcTonemap = params.tonemap;
+//        memcpy(&params.compositeParams.srcParams, &params.tonemapParams, sizeof(clTonemapParams));
+//        clImage * blendedImage = clImageBlend(C, dstImage, compositeImage, &params.compositeParams);
+//        if (!blendedImage) {
+//            clContextLogError(C, "Image blend failed, bailing out");
+//            clImageDestroy(C, blendedImage);
+//            FAIL();
+//        }
+//        clContextLog(C, "timing", -1, TIMING_FORMAT, timerElapsedSeconds(&t));
+//
+//        clImageDestroy(C, dstImage);
+//        dstImage = blendedImage;
+//    }
 
     if (haldImage) {
         clContextLog(C, "hald", 0, "Performing Hald CLUT postprocessing...");

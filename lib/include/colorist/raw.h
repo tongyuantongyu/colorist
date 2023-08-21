@@ -29,8 +29,8 @@ clBool clRawDeflate(struct clContext * C, clRaw * dst, const clRaw * src);
 char * clRawToBase64(struct clContext * C, clRaw * src);
 void clRawSet(struct clContext * C, clRaw * raw, const uint8_t * data, size_t len);
 void clRawFree(struct clContext * C, clRaw * raw);
-clBool clRawReadFile(struct clContext * C, clRaw * raw, const char * filename);
-clBool clRawReadFileHeader(struct clContext * C, clRaw * raw, const char * filename, size_t bytes);
-clBool clRawWriteFile(struct clContext * C, clRaw * raw, const char * filename);
+clBool clRawReadFile(struct clContext * C, clRaw * raw, const wchar_t * filename);
+clBool clRawReadFileHeader(struct clContext * C, clRaw * raw, const wchar_t * filename, size_t bytes);
+clBool clRawWriteFile(struct clContext * C, clRaw * raw, const wchar_t * filename);
 
 #endif

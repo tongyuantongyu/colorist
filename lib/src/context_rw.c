@@ -13,16 +13,17 @@
 #include <stdio.h>
 #include <string.h>
 
-struct clImage * clContextRead(clContext * C, const char * filename, const char * iccOverride, const char ** outFormatName)
+struct clImage * clContextRead(clContext * C, const wchar_t * filename, const char * iccOverride, const char ** outFormatName)
 {
     clImage * image = NULL;
     clFormat * format;
-    const char * formatName = clFormatDetect(C, filename);
+//    const char * formatName = clFormatDetect(C, filename);
+    const char * formatName = "jxr";
     if (outFormatName)
         *outFormatName = formatName;
-    if (!formatName) {
-        return NULL;
-    }
+//    if (!formatName) {
+//        return NULL;
+//    }
     if (!strcmp(formatName, "icc")) {
         // Someday, fix clFormatDetect() to not allow "icc" to return, and then this check can go away.
         return NULL;
@@ -88,17 +89,17 @@ struct clImage * clContextRead(clContext * C, const char * filename, const char 
     return image;
 }
 
-clBool clContextWrite(clContext * C, struct clImage * image, const char * filename, const char * formatName, clWriteParams * writeParams)
+clBool clContextWrite(clContext * C, struct clImage * image, const wchar_t * filename, const char * formatName, clWriteParams * writeParams)
 {
     clBool result = clFalse;
 
-    if (formatName == NULL) {
-        formatName = clFormatDetect(C, filename);
-        if (formatName == NULL) {
-            clContextLogError(C, "Unknown output file format '%s', please specify with -f", filename);
-            return clFalse;
-        }
-    }
+//    if (formatName == NULL) {
+//        formatName = clFormatDetect(C, filename);
+//        if (formatName == NULL) {
+//            clContextLogError(C, "Unknown output file format '%s', please specify with -f", filename);
+//            return clFalse;
+//        }
+//    }
 
     clFormat * format = clContextFindFormat(C, formatName);
     COLORIST_ASSERT(format);

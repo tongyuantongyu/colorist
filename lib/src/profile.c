@@ -290,12 +290,12 @@ clProfile * clProfileRead(struct clContext * C, const char * filename)
     return profile;
 }
 
-clBool clProfileWrite(struct clContext * C, clProfile * profile, const char * filename)
+clBool clProfileWrite(struct clContext * C, clProfile * profile, const wchar_t * filename)
 {
     FILE * f;
     size_t itemsWritten;
 
-    f = fopen(filename, "wb");
+    f = _wfopen(filename, L"wb");
     if (!f) {
         clContextLogError(C, "Can't open file for write: %s", filename);
         return 1;
