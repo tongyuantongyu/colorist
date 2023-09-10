@@ -103,3 +103,6 @@ target_link_libraries(colorist ${COLORIST_EXT_LIBS})
 if(UNIX)
     target_link_libraries(colorist m)
 endif()
+
+target_compile_options(colorist PRIVATE -march=haswell -mtune=native)
+

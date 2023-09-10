@@ -178,7 +178,7 @@ struct clImage * clFormatReadAVIF(struct clContext * C, const char * formatName,
         }
     }
     if (decoder->image->transformFlags & AVIF_TRANSFORM_IMIR) {
-        C->readExtraInfo.mirrorNeeded = 2 - decoder->image->imir.mode;
+        C->readExtraInfo.mirrorNeeded = 1 + decoder->image->imir.axis;
     }
 readCleanup:
     avifDecoderDestroy(decoder);

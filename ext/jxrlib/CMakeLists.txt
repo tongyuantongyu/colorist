@@ -63,3 +63,4 @@ include_directories(
 )
 
 add_library(jxrlib ${JXRLIB_SRCS})
+target_compile_options(jxrlib PRIVATE -march=haswell -mtune=native)

@@ -114,6 +114,11 @@ struct clImage * clFormatReadJXR(struct clContext * C, const char * formatName, 
             clContextLogError(C, "Invalid ICC profile in JXR");
             goto readCleanup;
         }
+
+        if (!memcmp(pixelFormat.pGUIDPixFmt, &GUID_PKPixelFormat32bppRGB101010, sizeof(GUID_PKPixelFormat32bppRGB101010))) {
+            clContextLog(C, "jxr", 1, "Decoded RGB10X2 JXR, assuming 10000 nits peek brightness");
+            clProfileSetLuminance(C, profile, 10000);
+        }
     } else {
         if (pixelFormat.bdBitDepth == BD_32F || pixelFormat.bdBitDepth == BD_16F) {
             clContextLog(C, "jxr", 1, "Decoded %s JXR with no profile, assuming MS Game Bar screencap (scRGB linear @ 80 nits)", pixelFormat.bdBitDepth == BD_32F ? "float" : "half");
